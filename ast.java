@@ -153,6 +153,7 @@ class ProgramNode extends ASTnode {
      */
     public void typeCheck() {
         // TODO: Implement a type checking method for this node and its children.
+        myDeclList.typeCheck();
     }
 
     public void unparse(PrintWriter p, int indent) {
@@ -203,7 +204,13 @@ class DeclListNode extends ASTnode {
             System.exit(-1);
         }
     }
-
+    // melody
+    public void typeCheck(){
+        for (DeclNode decl: myDecls){
+            decl.typeCheck();
+        }
+    }
+    // melody
     // list of kids (DeclNodes)
     private List<DeclNode> myDecls;
 }
@@ -275,8 +282,8 @@ class FnBodyNode extends ASTnode {
         myStmtList.unparse(p, indent);
     }
     // melody
-    public void typeCheck(){
-        myStmtList.typeCheck();
+    public void typeCheck(TypeNode funcRetType){
+        myStmtList.typeCheck(funcRetType);
     }
     // melody
     // 2 kids
@@ -306,9 +313,9 @@ class StmtListNode extends ASTnode {
         }
     }
     //melody
-    public void typeCheck(){
+    public void typeCheck(TypeNode funcRetType){
         for (StmtNode stmt: myStmts){
-            stmt.typeCheck();
+            stmt.typeCheck(funcRetType);
         }
     }
     //melody
@@ -362,6 +369,7 @@ abstract class DeclNode extends ASTnode {
      * Note: a formal decl needs to return a sym
      */
     abstract public Symb nameAnalysis(SymTable symTab);
+    public void typeCheck() {};
 }
 
 class VarDeclNode extends DeclNode {
@@ -553,7 +561,11 @@ class FnDeclNode extends DeclNode {
         myBody.unparse(p, indent+4);
         p.println("}\n");
     }
-
+    //melody
+    public void typeCheck(){
+        myBody.typeCheck(myType); //pass down untill the ret
+    }
+    //melody
     // 4 kids
     private TypeNode myType;
     private IdNode myId;
@@ -784,7 +796,7 @@ class StructNode extends TypeNode {
 
 abstract class StmtNode extends ASTnode {
     abstract public void nameAnalysis(SymTable symTab);
-    abstract public void typeCheck();
+    abstract public void typeCheck(TypeNode type);
 }
 
 class AssignStmtNode extends StmtNode {
@@ -806,8 +818,8 @@ class AssignStmtNode extends StmtNode {
         p.println(";");
     }
     // melody
-    public void typeCheck(){
-        myAssign.typeCheck();
+    public void typeCheck(TypeNode funcRetType){
+        myAssign.typeCheck(); 
     }
     //melody
 
@@ -834,7 +846,7 @@ class PreIncStmtNode extends StmtNode {
         myExp.unparse(p, 0);
     }
     //melody
-    public void typeCheck(){
+    public void typeCheck(TypeNode funcRetType){
         if(! myExp.typeCheck().isIntType()){
             String msg = "Arithmetic operator applied to non-numeric operand";
             ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
@@ -863,7 +875,14 @@ class PreDecStmtNode extends StmtNode {
         p.println("--;");
         myExp.unparse(p, 0);
     }
-
+    //melody
+    public void typeCheck(TypeNode funcRetType){
+        if(! myExp.typeCheck().isIntType()){
+            String msg = "Arithmetic operator applied to non-numeric operand";
+            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+        }
+    }
+    //melody
     // 1 kid
     private ExpNode myExp;
 }
@@ -887,7 +906,27 @@ class ReceiveStmtNode extends StmtNode {
         myExp.unparse(p, 0);
         p.println(";");
     }
-
+    // melody
+    public void typeCheck(TypeNode funcRetType){
+        //to do: check
+        if(!myExp.typeCheck().isBoolType() || !myExp.typeCheck().isIntType()){
+            String msg = "Type mismatch";
+            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+        }
+        if(myExp.typeCheck().isFnType()){
+            String msg = "Attempt to read function";
+            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+        }
+        if(myExp.typeCheck().isStructDefType()){
+            String msg = "Attempt to read struct name";
+            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+        }
+        if(myExp.typeCheck().isStructType()){
+            String msg = "Attempt to read struct variable";
+            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+        }
+    }
+    // melody
     // 1 kid (actually can only be an IdNode or an ArrayExpNode)
     private ExpNode myExp;
 }
@@ -911,7 +950,31 @@ class PrintStmtNode extends StmtNode {
         myExp.unparse(p, 0);
         p.println(";");
     }
-
+    // melody
+    public void typeCheck(TypeNode funcRetType){
+        //to do: check
+        if(!myExp.typeCheck().isBoolType() || !myExp.typeCheck().isIntType()){
+            String msg = "Type mismatch";
+            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+        }
+        if(myExp.typeCheck().isFnType()){
+            String msg = "Attempt to write function";
+            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+        }
+        if(myExp.typeCheck().isStructDefType()){
+            String msg = "Attempt to write struct name";
+            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+        }
+        if(myExp.typeCheck().isStructType()){
+            String msg = "Attempt to write struct variable";
+            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+        }
+        if(myExp.typeCheck().isVoidType()){
+            String msg = "Attempt to write void";
+            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+        }
+    }
+    // melody
     // 1 kid
     private ExpNode myExp;
 }
@@ -955,7 +1018,15 @@ class IfStmtNode extends StmtNode {
         addIndent(p, indent);
         p.println("}");
     }
-
+    // melody
+    public void typeCheck(TypeNode funcRetType){
+        if(!myExp.typeCheck().isBoolType() && !myExp.typeCheck().isErrorType()){
+            String msg = "Non-bool expression used as if condition";
+            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+        }
+        myStmtList.typeCheck(funcRetType);
+    }
+    // melody
     // e kids
     private ExpNode myExp;
     private DeclListNode myDeclList;
@@ -1024,7 +1095,16 @@ class IfElseStmtNode extends StmtNode {
         addIndent(p, indent);
         p.println("}");
     }
-
+    // melody
+    public void typeCheck(TypeNode funcRetType){
+        if(!myExp.typeCheck().isBoolType() && !myExp.typeCheck().isErrorType()){
+            String msg = "Non-bool expression used as if condition";
+            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+        }
+        myThenStmtList.typeCheck(funcRetType);
+        myElseStmtList.typeCheck(funcRetType);
+    }
+    // melody
     // 5 kids
     private ExpNode myExp;
     private DeclListNode myThenDeclList;
@@ -1072,7 +1152,15 @@ class WhileStmtNode extends StmtNode {
         addIndent(p, indent);
         p.println("}");
     }
-
+    // melody
+    public void typeCheck(TypeNode funcRetType){
+        if(!myExp.typeCheck().isBoolType() && !myExp.typeCheck().isErrorType()){
+            String msg = "Non-bool expression used as while condition";
+            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+        }
+        myStmtList.typeCheck(funcRetType);
+    }
+    // melody
     // 3 kids
     private ExpNode myExp;
     private DeclListNode myDeclList;
@@ -1118,7 +1206,15 @@ class RepeatStmtNode extends StmtNode {
         addIndent(p, indent);
         p.println("}");
     }
-
+    // melody
+    public void typeCheck(TypeNode funcRetType){
+        if(!myExp.typeCheck().isIntType() && !myExp.typeCheck().isErrorType()){
+            String msg = "Non-integer expression used as repeat clause";
+            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+        }
+        myStmtList.typeCheck(funcRetType);
+    }
+    // melody
     // 3 kids
     private ExpNode myExp;
     private DeclListNode myDeclList;
@@ -1144,7 +1240,11 @@ class CallStmtNode extends StmtNode {
         myCall.unparse(p, indent);
         p.println(";");
     }
-
+    // melody
+    public void typeCheck(TypeNode funcRetType){
+        myCall.typeCheck();
+    }
+    // melody
     // 1 kid
     private CallExpNode myCall;
 }
@@ -1174,7 +1274,27 @@ class ReturnStmtNode extends StmtNode {
         }
         p.println(";");
     }
-
+    // melody
+    public void typeCheck(TypeNode funcRetType){
+        Type retType = funcRetType.type();
+        if(myExp == null){
+            if(!retType.isVoidType()){
+                String msg = "Missing return value";
+                ErrMsg.fatal(0,0,msg);
+            }
+        }else{
+            if(retType.isVoidType()){
+                String msg = "Return with value in void function";
+                ErrMsg.fatal(myExp.getLineNum(),myExp.getCharNum(),msg);
+            }
+            else if(!retType.equals(myExp.typeCheck())){
+                if(myExp.typeCheck().isErrorType()) return;
+                String msg = "Bad return value";
+                ErrMsg.fatal(myExp.getLineNum(),myExp.getCharNum(),msg);
+            }
+        }
+    }
+    // melody
     // 1 kid
     private ExpNode myExp; // possibly null
 }
@@ -1189,9 +1309,9 @@ abstract class ExpNode extends ASTnode {
      */
     public void nameAnalysis(SymTable symTab) { }
     //MELODY
-    public Type typeCheck() { } //return Type of the leafnode
-    public int getLineNum() { } 
-    public int getCharNum() { }
+    public Type typeCheck() { return null; } //return Type of the leafnode
+    public int getLineNum() { return -1; } 
+    public int getCharNum() { return -1; }
 }
 
 class IntLitNode extends ExpNode {
@@ -1369,7 +1489,10 @@ class IdNode extends ExpNode {
     }
     // melody
     public Type typeCheck(){
-        return mySym.getType();
+        if(mySym != null)
+            return mySym.getType();
+        else
+            return null;
     }
 
     public int getLineNum(){
@@ -1518,7 +1641,7 @@ class DotAccessExpNode extends ExpNode {
     }
     // melody
     public Type typeCheck(){
-        return myId.sym().getType();
+        return myId.typeCheck();
     }
 
     public int getLineNum(){ 
@@ -1561,11 +1684,12 @@ class AssignNode extends ExpNode {
     }
     // melody
     public Type typeCheck(){
-        leftType = myLhs.typeCheck();
-        rightType = myExp.typeCheck();
+        Type leftType = myLhs.typeCheck();
+        Type rightType = myExp.typeCheck();
         boolean errFlag = false;
 
         if(! leftType.equals(rightType)){
+            if(leftType.isErrorType()||rightType.isErrorType()) return new ErrorType();
             String msg = "Type mismatch";
             ErrMsg.fatal(myLhs.getLineNum(), myLhs.getCharNum(), msg);
             errFlag = true;
@@ -1592,12 +1716,12 @@ class AssignNode extends ExpNode {
         }
     }
 
-    public int getLineNum(){ 
-        return myId.lineNum();
+    public int getLineNum(){    
+        return myLhs.getLineNum();
     }
 
     public int getCharNum(){
-        return myId.charNum();
+        return myLhs.getCharNum();
     }
     // melody
     // 2 kids
