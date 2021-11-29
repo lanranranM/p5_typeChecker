@@ -22,4 +22,6 @@
 37:17 ***ERROR*** Arithmetic operator applied to non-numeric operand
 38:5 ***ERROR*** Type mismatch
 41:18 ***ERROR*** Arithmetic operator applied to non-numeric operand
+41:27 ***ERROR*** Relational operator applied to non-numeric operand
+41:33 ***ERROR*** Relational operator applied to non-numeric operand
 Type checking error
