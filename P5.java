@@ -168,7 +168,7 @@ public class P5 {
 		case RESULT_NAMEANALYSIS_ERROR:
 			pukeAndDie("nameAnalysis error", resultCode);
 		default:
-			pukeAndDie("Type checking error", RESULT_OTHER_ERROR);
+			pukeAndDie("other errors", RESULT_OTHER_ERROR);
 		}
 	}
 	

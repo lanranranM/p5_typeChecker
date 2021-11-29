@@ -1,0 +1,29 @@
+int a;
+int b;
+int a1;
+bool c;
+bool d;
+int func1() {
+    a(int) = 0;
+    receive >> b(int);
+    print << c(bool);
+    ret a(int);
+}
+
+void func2() {
+    ret;
+}
+
+int func3(int a, int b) {
+    repeat (a(int)) {
+        a(int) = b(int);
+    }
+    ret 0;
+}
+
+void main() {
+    a1(int) = func1(->int)();
+    func2(->void)();
+    a1(int) = func3(int,int->int)(1, 2);
+}
+

@@ -909,21 +909,27 @@ class ReceiveStmtNode extends StmtNode {
     // melody
     public void typeCheck(TypeNode funcRetType){
         //to do: check
-        if(!myExp.typeCheck().isBoolType() || !myExp.typeCheck().isIntType()){
-            String msg = "Type mismatch";
-            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
-        }
-        if(myExp.typeCheck().isFnType()){
-            String msg = "Attempt to read function";
-            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
-        }
-        if(myExp.typeCheck().isStructDefType()){
-            String msg = "Attempt to read struct name";
-            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
-        }
-        if(myExp.typeCheck().isStructType()){
-            String msg = "Attempt to read struct variable";
-            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+        boolean errFlag = false;
+        if(!myExp.typeCheck().isBoolType() && !myExp.typeCheck().isIntType()){
+            if(myExp.typeCheck().isFnType()){
+                String msg = "Attempt to read function";
+                ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+                errFlag = true;
+            }
+            if(myExp.typeCheck().isStructDefType()){
+                String msg = "Attempt to read struct name";
+                ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+                errFlag = true;
+            }
+            if(myExp.typeCheck().isStructType()){
+                String msg = "Attempt to read struct variable";
+                ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+                errFlag = true;
+            }
+            if(!errFlag){
+                String msg = "Type mismatch";
+                ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+            }
         }
     }
     // melody
@@ -953,25 +959,27 @@ class PrintStmtNode extends StmtNode {
     // melody
     public void typeCheck(TypeNode funcRetType){
         //to do: check
-        if(!myExp.typeCheck().isBoolType() || !myExp.typeCheck().isIntType()){
-            String msg = "Type mismatch";
-            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
-        }
-        if(myExp.typeCheck().isFnType()){
-            String msg = "Attempt to write function";
-            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
-        }
-        if(myExp.typeCheck().isStructDefType()){
-            String msg = "Attempt to write struct name";
-            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
-        }
-        if(myExp.typeCheck().isStructType()){
-            String msg = "Attempt to write struct variable";
-            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
-        }
-        if(myExp.typeCheck().isVoidType()){
-            String msg = "Attempt to write void";
-            ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+        boolean errFlag = false;
+        if(!myExp.typeCheck().isBoolType() && !myExp.typeCheck().isIntType()){
+            if(myExp.typeCheck().isFnType()){
+                String msg = "Attempt to read function";
+                ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+                errFlag = true;
+            }
+            if(myExp.typeCheck().isStructDefType()){
+                String msg = "Attempt to read struct name";
+                ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+                errFlag = true;
+            }
+            if(myExp.typeCheck().isStructType()){
+                String msg = "Attempt to read struct variable";
+                ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+                errFlag = true;
+            }
+            if(!errFlag){
+                String msg = "Type mismatch";
+                ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
+            }
         }
     }
     // melody
@@ -1919,12 +1927,12 @@ class NotNode extends UnaryExpNode {
     }
     //melody
     public Type typeCheck(){
+        if(myExp.typeCheck().isErrorType()){
+            return new ErrorType();
+        }
         if (!myExp.typeCheck().isBoolType()){
             String msg = "Logical operator applied to non-bool operand";
             ErrMsg.fatal(myExp.getLineNum(),myExp.getCharNum(),msg);
-            return new ErrorType();
-        }
-        if(myExp.typeCheck().isErrorType()){
             return new ErrorType();
         }
         return new BoolType();
@@ -2095,18 +2103,18 @@ class AndNode extends BinaryExpNode {
     //melody
     public Type typeCheck(){
         boolean errFlag = false;
-        if (!myExp1.typeCheck().isBoolType()){
+        if(myExp1.typeCheck().isErrorType() || myExp2.typeCheck().isErrorType()){
+            return new ErrorType();
+        }
+        if (!myExp1.typeCheck().isBoolType() && !myExp1.typeCheck().isErrorType()){
             errFlag = true;
             String msg = "Logical operator applied to non-bool operand";
             ErrMsg.fatal(myExp1.getLineNum(),myExp1.getCharNum(),msg);
         }
-        if (!myExp2.typeCheck().isBoolType()){
+        if (!myExp2.typeCheck().isBoolType() || !myExp2.typeCheck().isErrorType()){
             errFlag = true;
             String msg = "Logical operator applied to non-bool operand";
             ErrMsg.fatal(myExp2.getLineNum(),myExp2.getCharNum(),msg);
-        }
-        if(myExp1.typeCheck().isErrorType() || myExp2.typeCheck().isErrorType()){
-            errFlag = true;
         }
         if(errFlag){
             return new ErrorType();
@@ -2131,6 +2139,9 @@ class OrNode extends BinaryExpNode {
     //melody
     public Type typeCheck(){
         boolean errFlag = false;
+        if(myExp1.typeCheck().isErrorType() || myExp2.typeCheck().isErrorType()){
+            return new ErrorType();
+        }
         if (!myExp1.typeCheck().isBoolType()){
             errFlag = true;
             String msg = "Logical operator applied to non-bool operand";
@@ -2140,9 +2151,6 @@ class OrNode extends BinaryExpNode {
             errFlag = true;
             String msg = "Logical operator applied to non-bool operand";
             ErrMsg.fatal(myExp2.getLineNum(),myExp2.getCharNum(),msg);
-        }
-        if(myExp1.typeCheck().isErrorType() || myExp2.typeCheck().isErrorType()){
-            errFlag = true;
         }
         if(errFlag){
             return new ErrorType();
