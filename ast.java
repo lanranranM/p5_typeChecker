@@ -910,18 +910,19 @@ class ReceiveStmtNode extends StmtNode {
     public void typeCheck(TypeNode funcRetType){
         //to do: check
         boolean errFlag = false;
-        if(!myExp.typeCheck().isBoolType() && !myExp.typeCheck().isIntType()){
-            if(myExp.typeCheck().isFnType()){
+        Type type = myExp.typeCheck();
+        if(!type.isBoolType() && !type.isIntType()){
+            if(type.isFnType()){
                 String msg = "Attempt to read function";
                 ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
                 errFlag = true;
             }
-            if(myExp.typeCheck().isStructDefType()){
+            if(type.isStructDefType()){
                 String msg = "Attempt to read struct name";
                 ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
                 errFlag = true;
             }
-            if(myExp.typeCheck().isStructType()){
+            if(type.isStructType()){
                 String msg = "Attempt to read struct variable";
                 ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
                 errFlag = true;
@@ -960,18 +961,19 @@ class PrintStmtNode extends StmtNode {
     public void typeCheck(TypeNode funcRetType){
         //to do: check
         boolean errFlag = false;
-        if(!myExp.typeCheck().isBoolType() && !myExp.typeCheck().isIntType()){
-            if(myExp.typeCheck().isFnType()){
+        Type type = myExp.typeCheck();
+        if(!type.isBoolType() && !type.isIntType()){
+            if(type.isFnType()){
                 String msg = "Attempt to read function";
                 ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
                 errFlag = true;
             }
-            if(myExp.typeCheck().isStructDefType()){
+            if(type.isStructDefType()){
                 String msg = "Attempt to read struct name";
                 ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
                 errFlag = true;
             }
-            if(myExp.typeCheck().isStructType()){
+            if(type.isStructType()){
                 String msg = "Attempt to read struct variable";
                 ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
                 errFlag = true;
@@ -1028,7 +1030,8 @@ class IfStmtNode extends StmtNode {
     }
     // melody
     public void typeCheck(TypeNode funcRetType){
-        if(!myExp.typeCheck().isBoolType() && !myExp.typeCheck().isErrorType()){
+        Type type = myExp.typeCheck();
+        if(!type.isBoolType() && !type.isErrorType()){
             String msg = "Non-bool expression used as if condition";
             ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
         }
@@ -1105,7 +1108,8 @@ class IfElseStmtNode extends StmtNode {
     }
     // melody
     public void typeCheck(TypeNode funcRetType){
-        if(!myExp.typeCheck().isBoolType() && !myExp.typeCheck().isErrorType()){
+        Type type = myExp.typeCheck();
+        if(!type.isBoolType() && !type.isErrorType()){
             String msg = "Non-bool expression used as if condition";
             ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
         }
@@ -1162,7 +1166,8 @@ class WhileStmtNode extends StmtNode {
     }
     // melody
     public void typeCheck(TypeNode funcRetType){
-        if(!myExp.typeCheck().isBoolType() && !myExp.typeCheck().isErrorType()){
+        Type type = myExp.typeCheck();
+        if(!type.isBoolType() && !type.isErrorType()){
             String msg = "Non-bool expression used as while condition";
             ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
         }
@@ -1216,7 +1221,8 @@ class RepeatStmtNode extends StmtNode {
     }
     // melody
     public void typeCheck(TypeNode funcRetType){
-        if(!myExp.typeCheck().isIntType() && !myExp.typeCheck().isErrorType()){
+        Type type = myExp.typeCheck();
+        if(!type.isIntType() && !type.isErrorType()){
             String msg = "Non-integer expression used as repeat clause";
             ErrMsg.fatal(myExp.getLineNum(), myExp.getCharNum(), msg);
         }
@@ -1291,12 +1297,13 @@ class ReturnStmtNode extends StmtNode {
                 ErrMsg.fatal(0,0,msg);
             }
         }else{
+            Type actType = myExp.typeCheck();
             if(retType.isVoidType()){
                 String msg = "Return with value in void function";
                 ErrMsg.fatal(myExp.getLineNum(),myExp.getCharNum(),msg);
             }
-            else if(!retType.equals(myExp.typeCheck())){
-                if(myExp.typeCheck().isErrorType()) return;
+            else if(!retType.equals(actType)){
+                if(actType.isErrorType()) return;
                 String msg = "Bad return value";
                 ErrMsg.fatal(myExp.getLineNum(),myExp.getCharNum(),msg);
             }
@@ -1902,12 +1909,13 @@ class UnaryMinusNode extends UnaryExpNode {
     }
     //melody
     public Type typeCheck(){
-        if (!myExp.typeCheck().isIntType()){
-            String msg = "Arithmetic operator applied to non-numeric operand";
-            ErrMsg.fatal(myExp.getLineNum(),myExp.getCharNum(),msg);
+        Type type = myExp.typeCheck();
+        if(type.isErrorType()){
             return new ErrorType();
         }
-        if(myExp.typeCheck().isErrorType()){
+        if (!type.isIntType()){
+            String msg = "Arithmetic operator applied to non-numeric operand";
+            ErrMsg.fatal(myExp.getLineNum(),myExp.getCharNum(),msg);
             return new ErrorType();
         }
         return new IntType();
@@ -1927,10 +1935,11 @@ class NotNode extends UnaryExpNode {
     }
     //melody
     public Type typeCheck(){
-        if(myExp.typeCheck().isErrorType()){
+        Type type = myExp.typeCheck();
+        if(type.isErrorType()){
             return new ErrorType();
         }
-        if (!myExp.typeCheck().isBoolType()){
+        if (!type.isBoolType()){
             String msg = "Logical operator applied to non-bool operand";
             ErrMsg.fatal(myExp.getLineNum(),myExp.getCharNum(),msg);
             return new ErrorType();
