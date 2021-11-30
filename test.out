@@ -1,29 +1,166 @@
 int a;
-int b;
-int a1;
-bool c;
-bool d;
-int func1() {
-    a(int) = 0;
-    receive >> b(int);
-    print << c(bool);
-    ret a(int);
+bool b;
+struct S{
+    int a;
 }
 
-void func2() {
+struct T{
+    bool b;
+}
+
+int g() {
+    ret 1;
+}
+
+bool f(int a, bool b) {
+    ret fls;
+}
+
+void v() {
     ret;
 }
 
-int func3(int a, int b) {
-    repeat (a(int)) {
-        a(int) = b(int);
+void basicTypes() {
+    struct S s;
+    a(int) = 1;
+    b(bool) = fls;
+    s(S).a(int) = a(int);
+    a(int) = g(->int)();
+    v(->void)();
+    print << "Hello World!\n";
+    if (tru) {
+        a(int) = 1;
+        b(bool) = fls;
+        s(S).a(int) = a(int);
+        a(int) = g(->int)();
+        v(->void)();
+        print << "Hello World!\n";
     }
-    ret 0;
+    else {
+        a(int) = 1;
+        b(bool) = fls;
+        s(S).a(int) = a(int);
+        a(int) = g(->int)();
+        v(->void)();
+        print << "Hello World!\n";
+    }
+    while (tru) {
+        a(int) = 1;
+        b(bool) = fls;
+        s(S).a(int) = a(int);
+        a(int) = g(->int)();
+        v(->void)();
+        print << "Hello World!\n";
+    }
+    repeat (1) {
+        a(int) = 1;
+        b(bool) = fls;
+        s(S).a(int) = a(int);
+        a(int) = g(->int)();
+        v(->void)();
+        print << "Hello World!\n";
+    }
 }
 
-void main() {
-    a1(int) = func1(->int)();
-    func2(->void)();
-    a1(int) = func3(int,int->int)(1, 2);
+void validOperations() {
+    bool result;
+    struct S s;
+    struct S s2;
+    result(bool) = (!tru);
+    result(bool) = (!fls);
+    result(bool) = (!result(bool));
+    result(bool) = (result(bool) && result(bool));
+    result(bool) = (result(bool) && fls);
+    result(bool) = (tru || fls);
+    result(bool) = (tru || result(bool));
+    result(bool) = ((a(int) == 1) || ((a(int) * 10) != 100));
+    a(int) = (1 + 1);
+    a(int) = (a(int) + 1);
+    a(int) = (1 - 1);
+    a(int) = (1 * 10);
+    a(int) = (1 / 10);
+    a(int) = (11 / a(int));
+    a(int) = (-a(int));
+    a(int) = (11 - ((-a(int)) * a(int)));
+    result(bool) = (a(int) < 10);
+    result(bool) = (a(int) > 10);
+    result(bool) = (a(int) <= 10);
+    result(bool) = (a(int) >= 10);
+    result(bool) = (s(S).a(int) == s2(S).a(int));
+    result(bool) = (b(bool) != fls);
+}
+
+void logical() {
+    bool result;
+    result(bool) = (result(bool) && b(bool));
+    result(bool) = (result(bool) && (b(bool) || b(bool)));
+    if ((tru && fls)) {
+    }
+    while (tru) {
+    }
+}
+
+void repeatLoop() {
+    repeat (10) {
+    }
+    repeat ((a(int) * a(int))) {
+    }
+}
+
+void arithmeticAndRelational() {
+    int a;
+    int b;
+    bool result;
+    a(int) = (a(int) + b(int));
+    a(int) = (a(int) - b(int));
+    a(int) = (a(int) * b(int));
+    a(int) = (a(int) / b(int));
+    a(int) = (-a(int));
+    result(bool) = (a(int) > b(int));
+    result(bool) = (a(int) < b(int));
+    result(bool) = (a(int) >= b(int));
+    result(bool) = (a(int) <= b(int));
+}
+
+void equalityOperators() {
+    int a;
+    bool b;
+    bool result;
+    result(bool) = (a(int) == a(int));
+    result(bool) = (a(int) != a(int));
+    result(bool) = (b(bool) == b(bool));
+    result(bool) = (b(bool) != b(bool));
+    result(bool) = ("asdf" == "asdf");
+    result(bool) = ("asdf" != "asdf");
+}
+
+void assignmentOperators() {
+    int a;
+    bool b;
+    a(int) = (a(int) + 1);
+    b(bool) = (b(bool) && b(bool));
+    a(int) = (a(int) = 1);
+    b(bool) = (b(bool) = fls);
+}
+
+void printAndReceive() {
+    struct S s;
+    struct T t;
+    print << a(int);
+    print << b(bool);
+    print << "Hi";
+    print << s(S).a(int);
+    print << t(T).b(bool);
+    receive >> a(int);
+    receive >> b(bool);
+    receive >> s(S).a(int);
+    receive >> t(T).b(bool);
+}
+
+void fnCalls() {
+    bool result;
+    f(int,bool->bool)(1, fls);
+    result(bool) = f(int,bool->bool)(a(int), b(bool));
+    a(int) = g(->int)();
 }
 
