@@ -2023,8 +2023,7 @@ class EqualsNode extends BinaryExpNode {
         myExp2.unparse(p, 0);
         p.print(")");
     }
-    // melody
-    public Type typeCheck() {
+    public Type typeCheck(){
         // err1: Type mismatch
         // err2: Equality operator applied to void functions
         // err3: Equality operator applied to functions
@@ -2033,40 +2032,41 @@ class EqualsNode extends BinaryExpNode {
         Type type1 = myExp1.typeCheck();
         Type type2 = myExp2.typeCheck();
         boolean errFlag = false;
-        if (type1.isErrorType() || type2.isErrorType()) {
+        if(type1.isErrorType() || type2.isErrorType()){
             return new ErrorType();
         }
-        if (!type1.equals(type2)) {
+        if(!type1.equals(type2)){
             errFlag = true;
             String msg = "Type mismatch";
-            ErrMsg.fatal(myExp1.getLineNum(), myExp1.getCharNum(), msg);
+            ErrMsg.fatal(myExp1.getLineNum(),myExp1.getCharNum(),msg);
         }
-        if (type1.isVoidType() && type2.isVoidType()) {
-            errFlag = true;
-            String msg = "Equality operator applied to void functions";
-            ErrMsg.fatal(myExp1.getLineNum(), myExp1.getCharNum(), msg);
+        if(!type1.isIntType() && !type1.isBoolType() && !type1.isStringType()){
+            if(type1.isVoidType() && type2.isVoidType()){
+                errFlag = true;
+                String msg = "Equality operator applied to void functions";
+                ErrMsg.fatal(myExp1.getLineNum(),myExp1.getCharNum(),msg);
+            }
+            if(type1.isFnType() && type2.isFnType()){
+                errFlag = true;
+                String msg = "Equality operator applied to functions";
+                ErrMsg.fatal(myExp1.getLineNum(),myExp1.getCharNum(),msg);
+            }
+            if(type1.isStructDefType() && type2.isStructDefType()){
+                errFlag = true;
+                String msg = "Equality operator applied to struct names";
+                ErrMsg.fatal(myExp1.getLineNum(),myExp1.getCharNum(),msg);
+            }
+            if(type1.isStructType() && type2.isStructType()){
+                errFlag = true;
+                String msg = "Equality operator applied to struct variables";
+                ErrMsg.fatal(myExp1.getLineNum(),myExp1.getCharNum(),msg);
+            }
         }
-        if (type1.isFnType() && type2.isFnType()) {
-            errFlag = true;
-            String msg = "Equality operator applied to functions";
-            ErrMsg.fatal(myExp1.getLineNum(), myExp1.getCharNum(), msg);
-        }
-        if (type1.isStructDefType() && type2.isStructDefType()) {
-            errFlag = true;
-            String msg = "Equality operator applied to struct names";
-            ErrMsg.fatal(myExp1.getLineNum(), myExp1.getCharNum(), msg);
-        }
-        if (type1.isStructType() && type2.isStructType()) {
-            errFlag = true;
-            String msg = "Equality operator applied to struct variables";
-            ErrMsg.fatal(myExp1.getLineNum(), myExp1.getCharNum(), msg);
-        }
-        if (errFlag) {
+        if(errFlag){
             return new ErrorType();
         }
         return new BoolType();
     }
-    // melody
 }
 
 class NotEqualsNode extends BinaryExpNode {
@@ -2080,7 +2080,7 @@ class NotEqualsNode extends BinaryExpNode {
         p.print(")");
     }
     // melody
-    public Type typeCheck() {
+    public Type typeCheck(){
         // err1: Type mismatch
         // err2: Equality operator applied to void functions
         // err3: Equality operator applied to functions
@@ -2089,35 +2089,37 @@ class NotEqualsNode extends BinaryExpNode {
         Type type1 = myExp1.typeCheck();
         Type type2 = myExp2.typeCheck();
         boolean errFlag = false;
-        if (type1.isErrorType() || type2.isErrorType()) {
+        if(type1.isErrorType() || type2.isErrorType()){
             return new ErrorType();
         }
-        if (!type1.equals(type2)) {
+        if(!type1.equals(type2)){
             errFlag = true;
             String msg = "Type mismatch";
-            ErrMsg.fatal(myExp1.getLineNum(), myExp1.getCharNum(), msg);
+            ErrMsg.fatal(myExp1.getLineNum(),myExp1.getCharNum(),msg);
         }
-        if (type1.isVoidType() && type2.isVoidType()) {
-            errFlag = true;
-            String msg = "Equality operator applied to void functions";
-            ErrMsg.fatal(myExp1.getLineNum(), myExp1.getCharNum(), msg);
+        if(!type1.isIntType() && !type1.isBoolType() && !type1.isStringType()){
+            if(type1.isVoidType() && type2.isVoidType()){
+                errFlag = true;
+                String msg = "Equality operator applied to void functions";
+                ErrMsg.fatal(myExp1.getLineNum(),myExp1.getCharNum(),msg);
+            }
+            if(type1.isFnType() && type2.isFnType()){
+                errFlag = true;
+                String msg = "Equality operator applied to functions";
+                ErrMsg.fatal(myExp1.getLineNum(),myExp1.getCharNum(),msg);
+            }
+            if(type1.isStructDefType() && type2.isStructDefType()){
+                errFlag = true;
+                String msg = "Equality operator applied to struct names";
+                ErrMsg.fatal(myExp1.getLineNum(),myExp1.getCharNum(),msg);
+            }
+            if(type1.isStructType() && type2.isStructType()){
+                errFlag = true;
+                String msg = "Equality operator applied to struct variables";
+                ErrMsg.fatal(myExp1.getLineNum(),myExp1.getCharNum(),msg);
+            }
         }
-        if (type1.isFnType() && type2.isFnType()) {
-            errFlag = true;
-            String msg = "Equality operator applied to functions";
-            ErrMsg.fatal(myExp1.getLineNum(), myExp1.getCharNum(), msg);
-        }
-        if (type1.isStructDefType() && type2.isStructDefType()) {
-            errFlag = true;
-            String msg = "Equality operator applied to struct names";
-            ErrMsg.fatal(myExp1.getLineNum(), myExp1.getCharNum(), msg);
-        }
-        if (type1.isStructType() && type2.isStructType()) {
-            errFlag = true;
-            String msg = "Equality operator applied to struct variables";
-            ErrMsg.fatal(myExp1.getLineNum(), myExp1.getCharNum(), msg);
-        }
-        if (errFlag) {
+        if(errFlag){
             return new ErrorType();
         }
         return new BoolType();
