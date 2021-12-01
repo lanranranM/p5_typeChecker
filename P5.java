@@ -114,7 +114,7 @@ public class P5 {
     private void pukeAndDie(String error, int retCode) {
         outStream.println(error);
         cleanup();
-        System.exit(-1);
+        System.exit(0);
     }
 
     /**
